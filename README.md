@@ -25,7 +25,7 @@ Start the project using:
 npm start
 
 Execute files: There are different files that we can execute like: TotalSellig.js, TotalRevenue.js, TopSellingProduct.js, and FilterByMonth.js.  We can execute them by using the following commands:
-node ./TotalSelling.js
-node ./TotalRevenue.js
-node ./TopSellingProduct.js
-node ./FilterByMonth.js
+- node ./TotalSelling.js
+- node ./TotalRevenue.js
+- node ./TopSellingProduct.js
+- node ./FilterByMonth.js
