@@ -1,24 +1,34 @@
-// Filtering  Sales by Date: Get all sales records for a specific month (e.g., February 2023).
+// // Filtering  Sales by Date: Get all sales records for a specific month (e.g., February 2023)
 
-const fs = require('fs');
+const salesData = require('./model/salesdata.json');
 
-// Read and parse the JSON file
-const rawData = fs.readFileSync('model/salesdata.json');
-const salesData = JSON.parse(rawData);
+// Function to get sales by specific month and year
+function getSalesByMonthYear(data, year, month) {
+    const index = data.reduce((index, record) => {
+        const date = new Date(record.date);
+        const recordYear = date.getFullYear();
+        const recordMonth = date.getUTCMonth(); 
+        const key = `${recordYear}-${recordMonth.toString().padStart(2, '0')}`;
+        
+        if (!index[key]) {
+            index[key] = [];
+        }
+        index[key].push(record);
+        return index;
+    }, {});
 
-// Function to filter sales by specific month and year
-function filterSalesByMonthYear(data, month, year) {
-    return data.filter(record => {
-        const recordDate = new Date(record.date);
-        return recordDate.getMonth() === month-1 && recordDate.getFullYear() === year;
-    });
+    const key = `${year}-${month.toString().padStart(2, '0')}`;
+    return index[key] || [];
 }
 
-// Define the month and year to filter by
-const targetMonth = 2; 
-const targetYear = 2023;
+// Define the target ISO date (YYYY-MM)
+const isoDate = '2023-01'; 
+const [targetYear, targetMonth] = isoDate.split('-').map(Number);
 
-// Filter the sales data
-const filteredSales = filterSalesByMonthYear(salesData, targetMonth, targetYear);
-
-console.log(`Sales Records for ${targetMonth}/${targetYear}:`, filteredSales);
+// Get sales data for the specified month and year
+const filteredSales = getSalesByMonthYear(salesData, targetYear, targetMonth);
+if (filteredSales.length > 0) {
+    console.log(`Sales Records for ${targetMonth}/${targetYear}:`, filteredSales);
+} else {
+    console.log(`No sales records found for ${targetMonth}/${targetYear}.`);
+}

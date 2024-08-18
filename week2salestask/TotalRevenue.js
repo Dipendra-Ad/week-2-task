@@ -1,36 +1,29 @@
-// calculating Total Revenue: Calculate the total revenue generated.
-const fs = require('fs');
+// // calculating Total Revenue: Calculate the total revenue generated.
 
-// Read and parse the JSON file
-const rawData = fs.readFileSync('model/salesdata.json');
-const salesData = JSON.parse(rawData);
+const salesData = require('./model/salesdata.json');
 
-// Function to calculate total sales for each product
-function calculateTotalSalesByProduct(data) {
-    const salesByProduct = {};
-
-    data.forEach(record => {
+// Function to calculate total sales for each product and total revenue
+function calculateSalesAndRevenue(data) {
+    return data.reduce((acc, record) => {
         const { product, quantity, price } = record;
         const totalSales = quantity * price;
 
-        if (!salesByProduct[product]) {
-            salesByProduct[product] = 0;
+        // Update sales by product
+        if (!acc.salesByProduct[product]) {
+            acc.salesByProduct[product] = 0;
         }
-        salesByProduct[product] += totalSales;
-    });
+        acc.salesByProduct[product] += totalSales;
 
-    return salesByProduct;
+        // Update total revenue
+        acc.totalRevenue += totalSales;
+
+        return acc;
+    }, { salesByProduct: {}, totalRevenue: 0 });
 }
 
-// Function to calculate total revenue
-function calculateTotalRevenue(salesByProduct) {
-    return Object.values(salesByProduct).reduce((total, sales) => total + sales, 0);
-}
+// Calculating total sales by product and total revenue
+const { salesByProduct, totalRevenue } = calculateSalesAndRevenue(salesData);
 
-// Calculating total sales for each product
-const salesByProduct = calculateTotalSalesByProduct(salesData);
-
-
-// Calculating total revenue
-const totalRevenue = calculateTotalRevenue(salesByProduct);
+// Display results
+console.log('Total Sales by Product:', salesByProduct);
 console.log('Total Revenue:', totalRevenue);

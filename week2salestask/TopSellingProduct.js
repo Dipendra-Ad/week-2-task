@@ -1,46 +1,30 @@
-// calculating Top Selling Product: Find the product with the highest total sales.
+// // calculating Top Selling Product: Find the product with the highest total sales.
 
-const fs = require('fs');
+const salesData = require('./model/salesdata.json');
 
-// Read and parse the JSON file
-const rawData = fs.readFileSync('model/salesdata.json');
-const salesData = JSON.parse(rawData);
-
-// Function to calculate total sales for each product
-function calculateTotalSalesByProduct(data) {
-    const salesByProduct = {};
-
-    data.forEach(record => {
+// Function to calculate total sales and find the top-selling product
+function calculateSalesAndFindTopProduct(data) {
+    return data.reduce((acc, record) => {
         const { product, quantity, price } = record;
         const totalSales = quantity * price;
 
-        if (!salesByProduct[product]) {
-            salesByProduct[product] = 0;
+        // Aggregate total sales by product
+        if (!acc.salesByProduct[product]) {
+            acc.salesByProduct[product] = 0;
         }
-        salesByProduct[product] += totalSales;
-    });
+        acc.salesByProduct[product] += totalSales;
 
-    return salesByProduct;
+        // Update top-selling product
+        if (acc.salesByProduct[product] > acc.maxSales) {
+            acc.maxSales = acc.salesByProduct[product];
+            acc.topProduct = product;
+        }
+
+        return acc;
+    }, { salesByProduct: {}, topProduct: null, maxSales: 0 });
 }
 
-// Function to find the top-selling product
-function findTopSellingProduct(salesByProduct) {
-    let topProduct = null;
-    let maxSales = 0;
-
-    for (const [product, sales] of Object.entries(salesByProduct)) {
-        if (sales > maxSales) {
-            maxSales = sales;
-            topProduct = product;
-        }
-    }
-
-    return { product: topProduct, totalSales: maxSales };
-}
-
-// Calculating total sales for each product
-const salesByProduct = calculateTotalSalesByProduct(salesData);
-
-// Finding the top-selling product
-const topSellingProduct = findTopSellingProduct(salesByProduct);
-console.log('Top Selling Product:', topSellingProduct);
+// Calculating total sales and finding the top-selling product
+const { salesByProduct, topProduct, maxSales } = calculateSalesAndFindTopProduct(salesData);
+console.log('Total Sales by Product:', salesByProduct);
+console.log('Top Selling Product:', { product: topProduct, totalSales: maxSales });
